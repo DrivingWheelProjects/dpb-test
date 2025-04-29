@@ -1,0 +1,17 @@
+{
+  "notebooks/MWEM.ipynb": {
+    "MWEM.html": "a3429a95"
+  },
+  "about.qmd": {
+    "about.html": "bdf76616"
+  },
+  "posts/post-with-code/index.qmd": {
+    "index.html": "d1f0bda2"
+  },
+  "posts/welcome/index.qmd": {
+    "index.html": "c11ef662"
+  },
+  "posts/MWEM/index.qmd": {
+    "index.html": "eaf27282"
+  }
+}
