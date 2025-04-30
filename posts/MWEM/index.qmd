@@ -88,7 +88,7 @@ We generate 100 random range queries for the `Age` column of the Adult dataset. 
 NUM_QUERIES = 100
 random_lower_bounds = [random.randint(1, 70) for _ in range(NUM_QUERIES)]
 Q = [(lb, random.randint(lb, 100)) for lb in random_lower_bounds]
-real_answers = [range_query(B, q) for q in random_workload]
+real_answers = [range_query(B, q) for q in Q]
 print('First 5 queries: ', Q[:5])
 print('First 5 answers: ', real_answers[:5])
 ```
@@ -159,7 +159,7 @@ Under this scoring function, queries with large error will receive high scores. 
 #| colab: {base_uri: https://localhost:8080/}
 q_i = report_noisy_max(data = B, 
                        options = Q, 
-                       score_function = mk_score_query(A_0), 
+                       score_function = mk_score_function(A_0), 
                        sensitivity = 1.0, 
                        epsilon = 1.0)
 q_i
@@ -225,7 +225,7 @@ def mwem(B, Q, T, epsilon, n):
         # Step 1: Select a query
         q_i = report_noisy_max(data = B, 
                                options = Q, 
-                               score_function = mk_score_query(A_i), 
+                               score_function = mk_score_function(A_i), 
                                sensitivity = 1.0, 
                                epsilon = epsilon/(2*T))
         
