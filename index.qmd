@@ -1,5 +1,5 @@
 ---
-title: "Green Mountain DPB"
+title: "Green Mountain Differential Privacy Blog - GMDPB"
 listing:
   contents: posts
   sort: "date desc"
