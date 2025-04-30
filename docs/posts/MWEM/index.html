@@ -203,6 +203,8 @@ window.Quarto = {
 
 
 <div id="eb7ef448" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
@@ -239,6 +241,7 @@ window.Quarto = {
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Return the element corresponding to that index</span></span>
 <span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> options[max_idx]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>The Multiplicative Weights with Exponential Mechanism (MWEM) mechanism is a differentially private, workload-aware algorithm for modeling the distribution of a private dataset. It can be used to answer query workloads, to generate synthetic data, or to build models that could be used for other purposes. The algorithm was original presented in the paper <a href="https://proceedings.neurips.cc/paper_files/paper/2012/file/208e43f0e45c4c78cafadb83d2888cb6-Paper.pdf">A Simple and Practical Algorithm for Differentially Private Data Release</a> by Moritz Hardt, Katrina Ligett, and Frank McSherry. MWEM has remained an influential approach since its introduction, since it’s simple and easy to implement but also works well in many cases.</p>
 <p>The complete algorithm (screenshotted from the paper) appears below, in Figure 1. The inputs to the algorithm are:</p>
@@ -260,8 +263,11 @@ window.Quarto = {
 <h1>The Private Data</h1>
 <p>The algorithm’s first argument, <span class="math inline">\(B\)</span>, is a private dataset. For our implementation, we’ll use the <code>Age</code> column of the Adult dataset.</p>
 <div id="d9090279" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>B <span class="op">=</span> adult[<span class="st">'Age'</span>]</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>B.hist()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -277,18 +283,24 @@ window.Quarto = {
 <p>In a workload-aware algorithm like MWEM, the goal is to build a model that does a good job answering the queries in the workload, under the assumption that the analyst has used domain-specific knowledge to carefully design the workload so it includes all of the most important queries. In practice, generating a good workload is actually really difficult, because most analysts don’t know exactly what the data will be used for when building the differentially private data release. Most papers use simple stand-ins for the workload, like 2- or 3-way marginal queries, prefix queries, or range queries.</p>
 <p>Our implementation supports arbitrary linear queries, but we’ll use random <a href="https://programming-dp.com/ch10.html#application-range-queries">range queries</a> as our workload. Specifically, our range queries will count the number of individuals in the dataset whose ages lie within an interval. The <code>range_query</code> function implements a range query on a pandas dataframe.</p>
 <div id="9f5d1056" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;}}" data-execution_count="3">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> range_query(data, q):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    lower, upper <span class="op">=</span> q</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">len</span>(data[(data <span class="op">&gt;=</span> lower) <span class="op">&amp;</span> (data <span class="op">&lt;</span> upper)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>We generate 100 random range queries for the <code>Age</code> column of the Adult dataset. We represent the queries using the upper and lower bound for each range. We can run these queries by calling the <code>range_query</code> function: the code below generates the queries, runs <code>range_query</code> to get the answers, and prints the first 5 elements of each.</p>
 <div id="e655ec43" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>NUM_QUERIES <span class="op">=</span> <span class="dv">100</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>random_lower_bounds <span class="op">=</span> [random.randint(<span class="dv">1</span>, <span class="dv">70</span>) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(NUM_QUERIES)]</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>Q <span class="op">=</span> [(lb, random.randint(lb, <span class="dv">100</span>)) <span class="cf">for</span> lb <span class="kw">in</span> random_lower_bounds]</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>real_answers <span class="op">=</span> [range_query(B, q) <span class="cf">for</span> q <span class="kw">in</span> Q]</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'First 5 queries: '</span>, Q[:<span class="dv">5</span>])</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'First 5 answers: '</span>, real_answers[:<span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>First 5 queries:  [(58, 100), (49, 92), (29, 84), (61, 69), (3, 46)]
 First 5 answers:  [3365, 7639, 23602, 1595, 22934]</code></pre>
@@ -300,16 +312,22 @@ First 5 answers:  [3365, 7639, 23602, 1595, 22934]</code></pre>
 <p>The first step of the algorithm says: “Let <span class="math inline">\(A_0\)</span> denote <span class="math inline">\(n\)</span> times the uniform distribution over <span class="math inline">\(D\)</span>.” What does that mean?</p>
 <p>In our case, where the dataset is the <code>Age</code> column of the Adult dataset, <span class="math inline">\(D\)</span> is the universe of all possible ages. If we assume nobody is older than 100 years old, then we could use the numbers from 0 to 100 for our universe.</p>
 <div id="ecf75e6d" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>Since <span class="math inline">\(D\)</span> is finite, we can represent a probability distribution over <span class="math inline">\(D\)</span> as a mapping from each element of <span class="math inline">\(D\)</span> to its probability (i.e.&nbsp;a <a href="https://en.wikipedia.org/wiki/Probability_mass_function">probability mass function</a> (PMF)). The PMF for the uniform distribution in this case assigns equal probability to each element of <span class="math inline">\(D\)</span>. Since we have 100 ages, the probability for each one is 1%. Finally, <span class="math inline">\(n\)</span> times this distribution scales each entry by <span class="math inline">\(n\)</span>.</p>
 <div id="c4654a59" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(adult)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>uniform_D <span class="op">=</span> {x: <span class="dv">1</span><span class="op">/</span><span class="bu">len</span>(D) <span class="cf">for</span> x <span class="kw">in</span> D} <span class="co"># give each record equal weight</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>A_0 <span class="op">=</span> {x: n<span class="op">*</span>uniform_D[x] <span class="cf">for</span> x <span class="kw">in</span> D} <span class="co"># scale each probability by n to get synthetic data</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Probability of age 20:'</span>, uniform_D[<span class="dv">20</span>])</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Number of synthetic records of age 20:'</span>, A_0[<span class="dv">20</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Probability of age 20: 0.01
 Number of synthetic records of age 20: 325.61</code></pre>
@@ -317,11 +335,14 @@ Number of synthetic records of age 20: 325.61</code></pre>
 </div>
 <p>In the code above, <code>uniform_D</code> represents a probability distribution, and <code>A_0</code> can be considered a <em>synthetic dataset</em>. If the probability that an individual’s age is 20 is 1%, and the Adult dataset has 32,561 people, then the expected number of 20-year-olds in a synthetic dataset sampled from the distribution would be 325.61. We can run a range query on the synthetic data by adding up the values of <code>A_0</code> for ages in the range:</p>
 <div id="6dbd9446" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> range_query_synthetic(A, q):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    lower, upper <span class="op">=</span> q</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>([A[age] <span class="cf">for</span> age <span class="kw">in</span> <span class="bu">range</span>(lower, upper)])</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>range_query_synthetic(A_0, Q[<span class="dv">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>13675.62</code></pre>
 </div>
@@ -343,18 +364,24 @@ Number of synthetic records of age 20: 325.61</code></pre>
 <li>Return the absolute difference between them - the error of the synthetic data for this query</li>
 </ol>
 <div id="62cfcfea" class="cell" data-execution_count="8">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mk_score_function(A_last):</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> score_function(data, q):</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        syn_answer <span class="op">=</span> range_query_synthetic(A_last, q)  <span class="co"># run the query on the synthetic data</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        real_answer <span class="op">=</span> range_query(data, q)             <span class="co"># run the query on the real data</span></span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">abs</span>(syn_answer <span class="op">-</span> real_answer)          <span class="co"># score is the absolute difference</span></span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> score_function</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>We use a nested function here because we will need to adjust the value of <code>A_last</code> as the algorithm runs. We can generate a score function for <code>A_0</code> and run it to see the error of the synthetic data on the first five queries of the workload:</p>
 <div id="57ee21be" class="cell" data-execution_count="9">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>score_fun <span class="op">=</span> mk_score_function(A_0)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> q <span class="kw">in</span> Q[:<span class="dv">5</span>]:</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(q, score_fun(B, q))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>(58, 100) 10310.62
 (49, 92) 6362.230000000001
@@ -365,12 +392,15 @@ Number of synthetic records of age 20: 325.61</code></pre>
 </div>
 <p>Under this scoring function, queries with large error will receive high scores. Picking the query with the maximum score corresponds to picking the query with the maximum error. The sensitivity of this function is 1, since <code>real_answer</code> is a range query with a sensitivity of 1. Thus we can use <code>report_noisy_max</code> to pick the highest-error query with differential privacy:</p>
 <div id="eaaf5071" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;}}" data-execution_count="10">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>q_i <span class="op">=</span> report_noisy_max(data <span class="op">=</span> B, </span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                       options <span class="op">=</span> Q, </span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                       score_function <span class="op">=</span> mk_score_function(A_0), </span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                       sensitivity <span class="op">=</span> <span class="fl">1.0</span>, </span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                       epsilon <span class="op">=</span> <span class="fl">1.0</span>)</span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>q_i</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>(18, 65)</code></pre>
 </div>
@@ -386,10 +416,13 @@ Number of synthetic records of age 20: 325.61</code></pre>
 </figure>
 </div>
 <div id="6044f144" class="cell" data-execution_count="11">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>m_i <span class="op">=</span> laplace_mech(range_query(B, q_i),</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                   sensitivity <span class="op">=</span> <span class="dv">1</span>,</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                   epsilon <span class="op">=</span> <span class="fl">1.0</span>)</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>m_i</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>30830.117541780408</code></pre>
 </div>
@@ -406,6 +439,8 @@ Number of synthetic records of age 20: 325.61</code></pre>
 </div>
 <p>The rule involves calculating a probability distribution for <span class="math inline">\(A_i\)</span> and then scaling it by <span class="math inline">\(n\)</span>, as we did for <code>A_0</code>. The key idea behind the rule is to scale the probability of each element <span class="math inline">\(x\)</span> based on the (signed) difference between the measurement <span class="math inline">\(m_i\)</span> and the query’s result on the old synthetic data. In Python, we can write:</p>
 <div id="8441c28e" class="cell" data-execution_count="12">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> in_range(q, x): <span class="co"># indicator function: 1 if x is in range, 0 otherwise</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    lower, upper <span class="op">=</span> q</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">int</span>(x <span class="op">&gt;=</span> lower <span class="kw">and</span> x <span class="op">&lt;</span> upper)</span>
@@ -420,6 +455,7 @@ Number of synthetic records of age 20: 325.61</code></pre>
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>A_1 <span class="op">=</span> mw_update(A_0, q_i, m_i)</span>
 <span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Number of 10-year-olds:'</span>, A_1[<span class="dv">10</span>])</span>
 <span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Number of 20-year-olds:'</span>, A_1[<span class="dv">20</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Number of 10-year-olds: 289.0343327919285
 Number of 20-year-olds: 366.85490131973995</code></pre>
@@ -432,6 +468,8 @@ Number of 20-year-olds: 366.85490131973995</code></pre>
 <h1>Completing the Algorithm</h1>
 <p>We can now define the complete algorithm in terms of the steps we’ve written so far. The only change from the code above is the splitting of the privacy budget: we use <span class="math inline">\(\epsilon/(2*T)\)</span> for each step, so that the total privacy budget equals <span class="math inline">\(\epsilon\)</span> by sequential composition.</p>
 <div id="92694c34" class="cell" data-execution_count="13">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mwem(B, Q, T, epsilon, n):</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Step 0: initialize A_i</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    A_0 <span class="op">=</span> {x: n<span class="op">*</span>uniform_D[x] <span class="cf">for</span> x <span class="kw">in</span> D} <span class="co"># scale each probability by n to get synthetic data</span></span>
@@ -458,10 +496,14 @@ Number of 20-year-olds: 366.85490131973995</code></pre>
 <span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>        A_i <span class="op">=</span> mw_update(A_i, q_i, m_i)</span>
 <span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A_i</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>In the code above, we also plot the synthetic data values in each iteration (with <code>plt.plot</code>), to visualize how the synthetic data changes over time.</p>
 <div id="57e0c142" class="cell" data-execution_count="14">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>A_final <span class="op">=</span> mwem(B, Q, <span class="dv">50</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(adult))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">

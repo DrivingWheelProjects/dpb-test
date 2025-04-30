@@ -1,6 +1,9 @@
 ---
 title: MWEM
 jupyter: python3
+format:
+    html:
+        code-fold: true
 ---
 
 ```{python}
